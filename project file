@@ -1,0 +1,169 @@
+import csv
+import os
+
+# File to store data
+fname = "student_data.csv"
+
+def init():
+    # create file if it doesn't exist
+    if not os.path.exists(fname):
+        with open(fname, 'w', newline='') as f:
+            w = csv.writer(f)
+            w.writerow(["Roll", "Name", "Class", "Marks"])
+
+def add():
+    print("\n Add Student ")
+    r = input("Roll No: ")
+    
+    # check for duplicates
+    try:
+        with open(fname, 'r') as f:
+            rd = csv.reader(f)
+            for row in rd:
+                if len(row) > 0 and row[0] == r:
+                    print("Roll number already exists.")
+                    return
+    except:
+        pass
+
+    n = input("Name: ")
+    c = input("Class: ")
+    m = input("Marks: ")
+
+    with open(fname, 'a', newline='') as f:
+        w = csv.writer(f)
+        w.writerow([r, n, c, m])
+    print("Added successfully")
+
+def view():
+    print("\n List of Students ")
+    try:
+        with open(fname, 'r') as f:
+            rd = csv.reader(f)
+            rows = list(rd)
+            
+            if len(rows) < 2:
+                print("No records found.")
+                return
+
+            print(f"{'Roll':<10} {'Name':<15} {'Class':<10} {'Marks':<10}")
+            
+            # skip header
+            for i in rows[1:]:
+                print(f"{i[0]:<10} {i[1]:<15} {i[2]:<10} {i[3]:<10}")
+    except:
+        print("Add a student first")
+
+def search():
+    print("\n Search ")
+    target = input("Enter Roll No: ")
+    found = False
+    
+    try:
+        with open(fname, 'r') as f:
+            rd = csv.reader(f)
+            next(rd) # skip header
+            for row in rd:
+                if row[0] == target:
+                    print("\nFound:")
+                    
+                    found = True
+                    break
+        
+        if not found:
+            print("Not found")
+    except:
+        print("Error")
+
+def update():
+    print("\n Update ")
+    target = input("Roll No to change: ")
+    temp = []
+    found = False
+
+    try:
+        with open(fname, 'r') as f:
+            rd = csv.reader(f)
+            # read everything into a list
+            for row in rd:
+                if row[0] == target:
+                    found = True
+                    print("Current details:", row)
+                    nm = input("New Name : ") 
+                    cl = input("New Class : ") 
+                    mk = input("New Marks : ") 
+                    temp.append([target, nm, cl, mk])
+                else:
+                    temp.append(row)
+        
+        if found:
+            # write back to file
+            with open(fname, 'w', newline='') as f:
+                w = csv.writer(f)
+                w.writerows(temp)
+            print("Updated.")
+        else:
+            print("Roll number not in database.")
+
+    except:
+        print("File error.")
+
+def delete():
+    print("\n Delete ")
+    target = input("Roll No to delete: ")
+    temp = []
+    found = False
+
+    try:
+        with open(fname, 'r') as f:
+            rd = csv.reader(f)
+            header = next(rd) #reads header
+            temp.append(header)
+            
+            for row in rd:
+                if row[0] == target:
+                    found = True
+                else:
+                    temp.append(row)
+
+        if found:
+            with open(fname, 'w', newline='') as f:
+                w = csv.writer(f)
+                w.writerows(temp)
+            print("Deleted.")
+        else:
+            print("Not found.")
+
+    except:
+        print("No file found.")
+
+def main():
+    init()
+    while True:
+        print("\n1. Add")
+        print("2. Update")
+        print("3. Delete")
+        print("4. Search")
+        print("5. Display")
+        print("6. Exit")
+        
+        ch = input("Choice (1-6): ")
+
+        if ch == '1':
+            add()
+        elif ch == '2':
+            update()
+        elif ch == '3':
+            delete()
+        elif ch == '4':
+            search()
+        elif ch == '5':
+            view()
+        elif ch == '6':
+            print("Code over")
+            break
+        else:
+            print("Incorrect, try again")
+
+if __name__ == "__main__":
+    main()
